@@ -59,11 +59,7 @@ class Bent_Coupler_Symm(i3.PCell):
             wg = i3.RoundedWaveguide(name=self.name+name_list[idx], trace_template=template_list[idx])
             wgs.append(wg)
         return wgs
-        # wg_in1 = i3.RoundedWaveguide(name=self.name+"_wg_in1", trace_template=self.wg_template)
-        # wg_in2 = i3.RoundedWaveguide(name=self.name+"_wg_in2", trace_template=self.wg_template)
-        # wg_out1 = i3.RoundedWaveguide(name=self.name+"_wg_out1", trace_template=self.wg_template)
-        # wg_out2 = i3.RoundedWaveguide(name=self.name+"_wg_out2", trace_template=self.wg_template)
-        # [wg_in1, wg_in2, wg_out1, wg_out2] = wgs
+        
 
     class Layout(i3.LayoutView):
         # specified parameters used for layout purposes
