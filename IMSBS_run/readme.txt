@@ -1,3 +1,3 @@
 """
-Documents for IM SBS project
+Shared experimental reports
 """
