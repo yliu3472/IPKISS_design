@@ -1,0 +1,87 @@
+out_mon=getresult('Out_mon','expansion for out');
+out_mon_wavelength=out_mon.lambda;
+out_mon_net=out_mon.T_net;
+out_mon_total=out_mon.T_total;
+
+cross_mon=getresult('Cross_mon','expansion for out');
+cross_mon_wavelength=cross_mon.lambda;
+cross_mon_net=cross_mon.T_net;
+cross_mon_total=cross_mon.T_total;
+
+#I2=abs(getdata('top','Ex'))^2 + abs(getdata('top','Ey'))^2 + abs(getdata('top','Ez'))^2;  
+#image(X,Y,I2);             # E-field intensity image plot
+#image(X,Y,10*log10(I2));   # E-field intensity image plot
+
+# attempting to export data for through transmission
+test_name=splitname+"_trough.csv";
+
+# write the header for 10 modes
+write(test_name,"wavelengths(nm), Total_modes, Mode1, Mode2, Mode3, Mode4, Mode5, Mode6, Mode7, Mode8, Mode9, Mode10");
+
+# loop which accesses the 10 matrix and outputs a string for saving because lumerical is stupid
+for(i=1:length(out_mon_wavelength)){
+  string_out=num2str(out_mon_wavelength(i))+", "+num2str(out_mon_total(i,1))+", "+num2str(out_mon_net(i,1))+", "+num2str(out_mon_net(i,2))+", "+num2str(out_mon_net(i,3))+", "+num2str(out_mon_net(i,4))+", "+num2str(out_mon_net(i,5))+", "+num2str(out_mon_net(i,6))+", "+num2str(out_mon_net(i,7))+", "+num2str(out_mon_net(i,8))+", "+num2str(out_mon_net(i,9))+", "+num2str(out_mon_net(i,10));  
+  write(test_name,string_out);
+}
+
+# lets do the same as above but in dB!
+# start by splitting name at the .txt and writing the header again
+#split_name_again=splitstring(test_name,".");
+log_name=splitname+"trough_dB.csv";
+write(log_name,"wavelengths(nm), Total_modes, Mode1, Mode2, Mode3, Mode4, Mode5, Mode6, Mode7, Mode8, Mode9, Mode10");
+
+# now loop over numbers and do the log in the vals as you go
+for(i=1:length(out_mon_wavelength)){
+  log_string_out=num2str(out_mon_wavelength(i))+", "+num2str(10.0*log10(out_mon_total(i,1)))+", "+num2str(10.0*log10(out_mon_net(i,1)))+", "+num2str(10.0*log10(out_mon_net(i,2)))+", "+num2str(10.0*log10(out_mon_net(i,3)))+", "+num2str(10.0*log10(out_mon_net(i,4)))+", "+num2str(10.0*log10(out_mon_net(i,5)))+", "+num2str(10.0*log10(out_mon_net(i,6)))+", "+num2str(10.0*log10(out_mon_net(i,7)))+", "+num2str(10.0*log10(out_mon_net(i,8)))+", "+num2str(10.0*log10(out_mon_net(i,9)))+", "+num2str(10.0*log10(out_mon_net(i,10)));
+  write(log_name,log_string_out);
+}
+
+############
+# attempting to export data for cross transmission
+test_name=splitname+"_cross.csv";
+
+# write the header for 10 modes
+write(test_name,"wavelengths(nm), Total_modes, Mode1, Mode2, Mode3, Mode4, Mode5, Mode6, Mode7, Mode8, Mode9, Mode10");
+
+# loop which accesses the 10 matrix and outputs a string for saving because lumerical is stupid
+for(i=1:length(cross_mon_wavelength)){
+  string_out=num2str(cross_mon_wavelength(i))+", "+num2str(cross_mon_total(i,1))+", "+num2str(cross_mon_net(i,1))+", "+num2str(cross_mon_net(i,2))+", "+num2str(cross_mon_net(i,3))+", "+num2str(cross_mon_net(i,4))+", "+num2str(cross_mon_net(i,5))+", "+num2str(cross_mon_net(i,6))+", "+num2str(cross_mon_net(i,7))+", "+num2str(cross_mon_net(i,8))+", "+num2str(cross_mon_net(i,9))+", "+num2str(cross_mon_net(i,10));  
+  write(test_name,string_out);
+}
+
+# lets do the same as above but in dB!
+# start by splitting name at the .txt and writing the header again
+#split_name_again=splitstring(test_name,".");
+log_name=splitname+"_cross_dB.csv";
+write(log_name,"wavelengths(nm), Total_modes, Mode1, Mode2, Mode3, Mode4, Mode5, Mode6, Mode7, Mode8, Mode9, Mode10");
+
+# now loop over numbers and do the log in the vals as you go
+for(i=1:length(out_mon_wavelength)){
+  log_string_out=num2str(cross_mon_wavelength(i))+", "+num2str(10.0*log10(cross_mon_total(i,1)))+", "+num2str(10.0*log10(cross_mon_net(i,1)))+", "+num2str(10.0*log10(cross_mon_net(i,2)))+", "+num2str(10.0*log10(cross_mon_net(i,3)))+", "+num2str(10.0*log10(cross_mon_net(i,4)))+", "+num2str(10.0*log10(cross_mon_net(i,5)))+", "+num2str(10.0*log10(cross_mon_net(i,6)))+", "+num2str(10.0*log10(cross_mon_net(i,7)))+", "+num2str(10.0*log10(cross_mon_net(i,8)))+", "+num2str(10.0*log10(cross_mon_net(i,9)))+", "+num2str(10.0*log10(cross_mon_net(i,10)));
+  write(log_name,log_string_out);
+}
+
+# if the option for cross section propagation is checked do below
+if (pow_section) {
+            X=getdata('top_view','x');  Y=getdata('top_view','y');
+            I2=abs(getdata('top_view','Ex'))^2 + abs(getdata('top_view','Ey'))^2 + abs(getdata('top_view','Ez'))^2;  
+            # name for figures
+            lin_name=splitname+"_lin_fig";            
+            prop_pow = image(X,Y,I2,"","",lin_name);
+            exportfigure(lin_name);
+            log_name=splitname+"_dB_fig"; 
+            prop_pow_dB = image(X,Y,10*log10(I2),"","",log_name);
+            exportfigure(log_name);
+            closeall;
+}
+
+
+# logic to output pow section data for plotting externally
+if (field_export) {
+            X=getdata('top_view','x');  Y=getdata('top_view','y');
+            I2=abs(getdata('top_view','Ex'))^2 + abs(getdata('top_view','Ey'))^2 + abs(getdata('top_view','Ez'))^2;  
+            I2dB = 10*log10(I2);            
+            # name for figures
+            hdf5_name=splitname+"_export";
+            matlabsave(hdf5_name, X, Y, I2, I2dB);
+}

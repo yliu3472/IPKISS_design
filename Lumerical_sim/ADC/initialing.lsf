@@ -1,0 +1,43 @@
+# initialising multiple simulations, cells are a pain
+clear;
+files_in=1;
+in_radii=cell(files_in);
+in_gds=cell(files_in);
+
+# all the inputs, out of sublime from the print
+# in_radii{1}='54.0';in_radii{2}='58.0';in_radii{3}='62.0';
+# params for waveguide
+coupler_length = 104e-6;
+coupler_gap = 1e-6;
+silica_thickness=0.5e-6;
+thick_Chalc = 0.68e-6;
+# generating the Euler names, with a string swap for floats
+# radii_22um_to_25um_Width;
+in_radii{1}='14.0';#in_radii{2}='16.5';in_radii{3}='22.0';
+in_gds{1}='ADC100.gds';#in_gds{2}='New_Euler_R16_5um_W_1_9um.gds';in_gds{3}='New_Euler_R22_0um_W_1_9um.gds';
+
+# trying to loop over multiple gdsii
+mesh=1;
+mode_num_input=1;
+pow_section=1;
+field_export=0;
+# loop over the different files outputting text file as it goes
+for(k=1:length(in_radii)){
+	# switching to layout to delete previous simulation files
+	switchtolayout;
+	groupscope("::model");
+	deleteall;
+	# grabbing bend radius from above and converting to um!
+	bend_radius=str2num(in_radii{k})*1e-6;
+	file_gds=in_gds{k};
+	# pring gds name as a marker over the calculations
+	?file_gds;
+	bend_without_draw_fresh;
+	bend_FDTD_setup_fresh;
+	run;
+	# calculating name for output txt file
+	splitted=splitstring(file_gds,".");
+	splitname=splitted{1} + "_test";
+	data_1_mon_export;
+	?splitname;
+}

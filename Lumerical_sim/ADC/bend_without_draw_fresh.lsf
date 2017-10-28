@@ -1,0 +1,119 @@
+# bend_draw.lsf  - Define simulation parameters, draw the bend
+# input: variable "bend_radius" pre-defined
+
+# define wafer structure
+thick_Clad = 3e-6;
+thick_BOX = 2e-6;
+thick_Slab = 0;           # for strip waveguides
+#thick_Slab = 0.09e-6;    # for rib waveguides
+# width of the waveguide
+
+# define materials
+material_Clad = "SiO2 (Glass) - Const";
+material_BOX  = "SiO2 (Glass) - Const";
+material_Si   = "Si (Silicon) - Dispersive & Lossless";
+material_Chalc = "Chalc2cm";
+#material_OrmoCore = "Ormocore_11_june";
+#material_OrmoPrime = "Ormoprime_11_june";
+material_ANU_silica = "SiO2_ANU_11_June";
+# swap the materials to air for the EBL transmission
+material_OrmoCore = "Air (1)";
+material_OrmoPrime = "Air (1)";
+
+Extra=0.5e-6;
+thick_margin = 2.5e-6;
+width_margin=2.5e-6;
+length_margin=20e-6;
+length_input=2e-6;
+
+Xmin = 0-coupler_length/2-length_margin;
+Xmax = 0+coupler_length/2+length_margin;
+Zmin =-thick_margin;  Zmax=thick_Chalc+thick_margin;
+Ymin = -1e-6-coupler_gap-width_margin;
+Ymax = -1*Ymin+width_margin;
+
+# air layer, space occupied by waveguide and cladding will be  override.
+addrect;  set('name','Ormocore_Clad');  set("material", material_OrmoCore);
+set('y min', Ymin-Extra);  set('y max', Ymax+Extra);
+set('z min', 0);           set('z max', Zmax);
+set('x min', Xmin-Extra);  set('x max', Xmax+Extra);
+# set('mesh order', 1);
+# set material transparency for graphical tab
+set('alpha', 0.2);
+
+# the silica slab
+addrect;  set('name','silica_slab');  set("material", material_ANU_silica);
+set('y min', Ymin-Extra);  set('y max', Ymax+Extra);
+set('z min', 0);           set('z max', silica_thickness);
+set('x min', Xmin-Extra);  set('x max', Xmax+Extra);
+# set('mesh order', 1);
+set('alpha', 0.3);
+# add substrate
+addrect;  set("name", "Substrate");  set("material", material_ANU_silica);
+set('x min', Xmin-Extra);  set('x max', Xmax+Extra);
+set('z min', Zmin);  set('z max', 0);
+set('y min', Ymin-Extra);  set('y max', Ymax+Extra);
+set('alpha', 0.4);
+
+# stuff for importing the gdsii
+
+cell_name="Full_Geometry";
+z_start=0;
+wave_thick=thick_Chalc;
+
+#gdsimport(file_gds, cell_name, "1:2",material_Chalc,z_start,wave_thick);
+#set("material", material_Chalc);
+#set("z", wave_thick/2);
+#set("z span", wave_thick);
+# file_gds="Taper_0_85um_to_2_5um_L20_0um.gds";
+
+# trying layer builder instead of gds import
+addlayerbuilder;
+set("name","Waveguide layer");
+
+# background geometry
+set("x",0);
+set("y",0);
+set("z",0);
+set("x span", 20e-6);
+set("y span", 20e-6);
+
+# adding layer and loading gds
+addlayer("waveguide");
+#file_gds = 'BTB_5um_Taper_2_5um_to_0_85um_L5_0um.gds';
+loadgdsfile(file_gds);
+pattern_name = getlayerlist;
+?pattern_name;
+?pattern_name{1};
+?pattern_name{2};
+?pattern_name{3};
+# setting layer properties
+setlayer("waveguide","layer number",pattern_name{2});
+setlayer("waveguide","pattern material",material_Chalc);
+setlayer("waveguide","thickness",wave_thick);
+set("gds position reference", 1);
+
+
+
+# adding a seperate layer builder so they are on the same level
+# trying layer builder instead of gds import
+addlayerbuilder;
+set("name","Cladding layer");
+
+# background geometry
+set("x",0);
+set("y",0);
+set("z",0);
+set("x span", 20e-6);
+set("y span", 20e-6);
+# need GDS to generate the cladding layer too!
+# adding layer and loading gds
+addlayer("cladding");
+#file_gds = 'BTB_5um_Taper_2_5um_to_0_85um_L5_0um.gds';
+loadgdsfile(file_gds);
+pattern_name = getlayerlist;
+# setting layer properties
+setlayer("cladding","layer number",pattern_name{3});
+setlayer("cladding","pattern material",material_ANU_silica);
+setlayer("cladding","thickness",wave_thick+silica_thickness);
+set("gds position reference", 1);

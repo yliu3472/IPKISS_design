@@ -1,0 +1,119 @@
+# bend_FDTD_setup.lsf - setup FDTD simulation for bend calculations
+
+wavelength=1.55e-6;
+wave_range=0.2e-6;
+#Mode_Selection = 'user select';
+Mesh_level=mesh;  # Mesh of 3 is suitable for high accuracy  
+y_north_position=2.8e-6+coupler_gap/2;# y ofset for input and through ports
+y_south_position=-0.425e-6-coupler_gap/2;# y ofset for cross ports
+
+addfdtd;
+set('x min', Xmin); set('x max', Xmax);
+set('y min', Ymin); set('y max', Ymax);
+set('z min', Zmin);  set('z max', Zmax);
+set('mesh accuracy', Mesh_level);
+
+# setting number of points
+points=100;
+#save;
+addmode;
+set('injection axis', 'x-axis');
+set('direction', 'forward');
+set('y', y_north_position); 
+set('y span', 1e-6+width_margin);
+set('x', Xmin+300e-9); 
+set('z min', Zmin); set('z max', Zmax);
+set('set wavelength',wavelength);
+set('wavelength start', wavelength-wave_range); 
+set('wavelength stop',wavelength+wave_range);
+#set('mode selection', 'fundamental TM mode');
+set("mode selection",'user select');    # use the 'user select' option
+seteigensolver('use max index',1);     
+updatesourcemode(mode_num_input); 
+
+addpower;   # Power monitor, input
+set('name', 'input');
+set('monitor type', '2D X-normal');
+set('y', y_north_position); 
+set('y span', 1e-6+width_margin);
+set('x', Xmin+500e-9); 
+set('z min', Zmin); set('z max', Zmax);
+
+# adding offset for y min shift
+#y_offset = Ymin;
+
+addpower;   # Power monitor, output
+set('name', 'transmission');
+set('monitor type', '2D X-normal');
+set('y',  y_north_position); 
+set('y span', 1e-6+width_margin);
+set('z min', Zmin); set('z max', Zmax);
+set('x', Xmax-300e-9);
+
+# the multiple expansion monitors
+addmodeexpansion;
+set('name', 'Out_mon');
+set('monitor type', '2D X-normal');
+set('y', y_north_position); 
+set('y span', 1e-6+width_margin);
+set('z min', Zmin); set('z max', Zmax);
+set('x', Xmax-300e-9);
+set("mode selection",'user select');    # use the 'user select' option
+seteigensolver('use max index',1);     
+#seteigensolver("n",1.1);
+updatemodes(1:10);    
+set('frequency points',points);
+set('auto update before analysis', 0);
+setexpansion('out','transmission');
+
+# the multiple expansion monitors for cross transmission
+addpower;   # Power monitor, output
+set('name', 'cross');
+set('monitor type', '2D X-normal');
+set('y',  y_south_position); 
+set('y span', 1e-6+width_margin);
+set('z min', Zmin); set('z max', Zmax);
+set('x', Xmax-300e-9);
+
+
+addmodeexpansion;
+set('name', 'Cross_mon');
+set('monitor type', '2D X-normal');
+set('y', y_south_position); 
+set('y span', 1e-6+width_margin);
+set('z min', Zmin); set('z max', Zmax);
+set('x', Xmax-300e-9);
+set("mode selection",'user select');    # use the 'user select' option
+seteigensolver('use max index',1);     
+#seteigensolver("n",1.1);
+updatemodes(1:10);    
+set('frequency points',points);
+set('auto update before analysis', 0);
+setexpansion('out','cross');
+
+# monitor the power distribution from top view
+if (pow_section) {
+      addpower;   # Power monitor, top-view
+            set('name', 'top_view');
+            set('monitor type', '2D Z-normal');
+            set('x min', Xmin + 200e-9);   set('x max', Xmax);
+            set('y min', Ymin);   set('y max', Ymax);
+            set('z', thick_Chalc/2); # cross-section through the middle of the waveguide
+            set('override global monitor settings', 1);
+            set('use source limits', 0);
+            # set('wavelength (um)', 1);
+            set('wavelength center', wavelength);
+            set('frequency points', 1);
+}
+
+
+
+if (0) {
+	addmovie;
+	set('name', 'movie');
+	set('lockAspectRatio', 1);
+	set('monitor type', '2D Z-normal');
+	set('x min', Xmin); set('x max', Xmax);
+	set('y min', Ymin); set('y max', Ymax);
+	set('z', 0.5*thick_Si);
+}

@@ -1,0 +1,2 @@
+# all the gds names from python so doesnt clog main file
+in_gds{1}='Euler_R34_0um_W2_6um.gds';in_gds{2}='Euler_R38_0um_W2_6um.gds';in_gds{3}='Euler_R42_0um_W2_6um.gds';in_gds{4}='Euler_R46_0um_W2_6um.gds';in_gds{5}='Euler_R50_0um_W2_6um.gds';
