@@ -194,7 +194,7 @@ class Bent_Coupler_Symm(i3.PCell):
 
             # set the directional coupler (can also be MMI)
             # and then pass it as an child PCell to Bend_Coupler PCell
-            C = Bent_Coupler_Symmr(name="my_dircoup_2",
+            C = Bent_Coupler_Symm(name="my_dircoup_2",
                                    trace_template1=wg_t1,
                                    trace_template2=wg_t2,
                                    coupler_length=20.0)
@@ -349,7 +349,7 @@ class Bent_Coupler_Arb(Bent_Coupler_Symm):
 
             layout_DC = DC.Layout(coupler_spacing=10.0)
 
-            C = Bent_Coupler(name="modal_coupler",
+            C = Bent_Coupler_Arb(name="modal_coupler",
                              wg_template1=wg_t1,
                              wg_template2=wg_t2,
                              coupler=DC)
